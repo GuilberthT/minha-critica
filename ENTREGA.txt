@@ -7,7 +7,7 @@ Integrantes:
 - Lucas Gonçalves Cavanha
 
 1. Código-fonte: arquivo minha-critica.zip (este pacote)
-   Repositório público: https://github.com/____________/minha-critica
+   Repositório público: https://github.com/GuilberthT/minha-critica
 
 2. Slides da apresentação: ____________ (link ou arquivo .pptx/.pdf enviado junto)
 

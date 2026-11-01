@@ -9,7 +9,7 @@ Trabalho prático de Desenvolvimento de Aplicação Web com Spring Boot — UFMS
 - Pedro Paulo Pereira Lacerda
 - Lucas Gonçalves Cavanha
 
-Repositório: _colar aqui o link do GitHub_
+Repositório: https://github.com/GuilberthT/minha-critica
 
 ## O problema que a aplicação resolve
 
