@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(${obra.titulo})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" tabindex="-1" class="container secao">
+    <nav aria-label="Trilha de navegação" class="trilha">
+        <ol>
+            <li><a th:href="@{/obras}">Catálogo</a></li>
+            <li aria-current="page" th:text="${obra.titulo}">Título</li>
+        </ol>
+    </nav>
+
+    <div th:replace="~{fragments/layout :: mensagens}"></div>
+
+    <article class="obra-detalhe">
+        <p class="etiqueta" th:text="${obra.tipo.descricao}">Filme</p>
+        <h1 th:text="${obra.titulo}">Título</h1>
+        <dl class="ficha">
+            <div><dt>Gênero</dt><dd th:text="${obra.genero}">Drama</dd></div>
+            <div><dt>Ano</dt><dd th:text="${obra.anoLancamento}">2000</dd></div>
+            <div th:if="${obra.autorOuDiretor}">
+                <dt th:text="${obra.tipo.name() == 'LIVRO'} ? 'Autor(a)' : 'Direção / criação'">Direção</dt>
+                <dd th:text="${obra.autorOuDiretor}">Nome</dd>
+            </div>
+            <div>
+                <dt>Média</dt>
+                <dd>
+                    <strong th:text="${obra.mediaFormatada}">4,5</strong>
+                    <span th:text="|de 5 (${obra.textoCriticas})|">de 5</span>
+                </dd>
+            </div>
+        </dl>
+        <h2>Sinopse</h2>
+        <p th:text="${obra.sinopse}">Sinopse</p>
+
+        <p sec:authorize="hasRole('ADMIN')" class="acoes">
+            <a th:href="@{/admin/obras/{id}/editar(id=${obra.id})}" class="botao botao-secundario">Editar obra</a>
+        </p>
+    </article>
+
+    <section id="criticas" aria-labelledby="titulo-criticas" class="secao">
+        <h2 id="titulo-criticas">Críticas</h2>
+
+        <!-- Formulário de nova crítica (RN03: uma por usuário) -->
+        <div th:unless="${jaCriticou}" class="caixa-form">
+            <h3>Escreva sua crítica</h3>
+            <form th:action="@{/obras/{id}/criticas(id=${obra.id})}" th:object="${criticaForm}"
+                  method="post" class="formulario" novalidate>
+                <fieldset class="nota-estrelas"
+                          th:attr="aria-describedby=${#fields.hasErrors('nota')} ? 'erro-nota' : null">
+                    <legend>Nota</legend>
+                    <div class="opcoes-nota">
+                        <th:block th:each="n : ${#numbers.sequence(1, 5)}">
+                            <input type="radio" name="nota" th:id="|nota-${n}|" th:value="${n}"
+                                   th:checked="${criticaForm.nota == n}" required>
+                            <label th:for="|nota-${n}|">
+                                <span aria-hidden="true" th:text="${n} + ' ★'">1 ★</span>
+                                <span class="sr-only" th:text="${n} == 1 ? '1 estrela' : |${n} estrelas|">1 estrela</span>
+                            </label>
+                        </th:block>
+                    </div>
+                    <p id="erro-nota" class="erro-campo" th:if="${#fields.hasErrors('nota')}" th:errors="*{nota}"></p>
+                </fieldset>
+
+                <div class="campo">
+                    <label for="comentario">Comentário</label>
+                    <textarea id="comentario" th:field="*{comentario}" rows="4" maxlength="1000" required
+                              data-contador="contador-comentario"
+                              th:attr="aria-invalid=${#fields.hasErrors('comentario')},aria-describedby=${#fields.hasErrors('comentario')} ? 'erro-comentario contador-comentario' : 'contador-comentario'"></textarea>
+                    <p id="contador-comentario" class="dica" aria-live="polite">Entre 10 e 1000 caracteres.</p>
+                    <p id="erro-comentario" class="erro-campo" th:if="${#fields.hasErrors('comentario')}"
+                       th:errors="*{comentario}"></p>
+                </div>
+
+                <button type="submit" class="botao botao-primario">Publicar crítica</button>
+            </form>
+        </div>
+        <p th:if="${jaCriticou}" class="caixa-info">Você já avaliou esta obra. Obrigado pela crítica!</p>
+
+        <p th:if="${#lists.isEmpty(obra.criticas)}">Ainda não há críticas. Seja a primeira pessoa a avaliar!</p>
+
+        <ul class="lista-criticas" th:unless="${#lists.isEmpty(obra.criticas)}">
+            <li th:each="c : ${obra.criticas}" class="critica">
+                <article>
+                    <header class="critica-topo">
+                        <h3 class="critica-autor" th:text="${c.autor.nome}">Autor</h3>
+                        <span th:replace="~{fragments/layout :: estrelas(${c.nota})}"></span>
+                        <time th:datetime="${#temporals.format(c.dataCriacao, 'yyyy-MM-dd')}"
+                              th:text="${#temporals.format(c.dataCriacao, 'dd/MM/yyyy')}">01/01/2026</time>
+                    </header>
+                    <p th:text="${c.comentario}">Comentário</p>
+
+                    <!-- RN04: autor exclui a própria crítica; admin exclui qualquer uma -->
+                    <form th:if="${#authentication.principal.id == c.autor.id or #authentication.principal.admin}"
+                          th:action="@{/criticas/{id}/excluir(id=${c.id})}" method="post"
+                          data-confirmar="Excluir esta crítica? Esta ação não pode ser desfeita.">
+                        <button type="submit" class="botao-link perigo"
+                                th:attr="aria-label=|Excluir crítica de ${c.autor.nome}|">Excluir</button>
+                    </form>
+                </article>
+            </li>
+        </ul>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>

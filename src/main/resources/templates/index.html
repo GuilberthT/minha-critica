@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Início')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" tabindex="-1">
+    <section class="hero" aria-labelledby="titulo-hero">
+        <div class="container">
+            <h1 id="titulo-hero">Sua opinião sobre filmes, séries e livros em um só lugar</h1>
+            <p class="hero-texto">
+                O <strong>Minha Crítica</strong> reúne obras brasileiras e do mundo todo para você descobrir,
+                avaliar com estrelas e ler o que outras pessoas acharam.
+            </p>
+            <div class="acoes">
+                <a th:href="@{/obras}" class="botao botao-primario">Ver catálogo</a>
+                <a sec:authorize="isAnonymous()" th:href="@{/cadastro}" class="botao botao-secundario">Criar conta grátis</a>
+            </div>
+            <p th:if="${param.saiu}" class="alerta alerta-sucesso" role="status">Você saiu da sua conta.</p>
+        </div>
+    </section>
+
+    <section class="container secao" aria-labelledby="titulo-recentes">
+        <h2 id="titulo-recentes">Adicionadas recentemente</h2>
+        <p class="texto-suave" th:text="|${totalObras} obras no catálogo|">0 obras no catálogo</p>
+
+        <p th:if="${#lists.isEmpty(recentes)}">Nenhuma obra cadastrada ainda.</p>
+
+        <ul class="grade-cards" th:unless="${#lists.isEmpty(recentes)}">
+            <li th:each="obra : ${recentes}" class="card">
+                <article>
+                    <p class="etiqueta" th:text="${obra.tipo.descricao}">Filme</p>
+                    <h3 th:text="${obra.titulo}">Título</h3>
+                    <p class="texto-suave" th:text="|${obra.genero} · ${obra.anoLancamento}|">Drama · 2000</p>
+                    <p class="media">
+                        <span aria-hidden="true">★</span>
+                        <span th:text="${obra.mediaFormatada}">4,5</span>
+                        <span class="texto-suave" th:text="|(${obra.textoCriticas})|">(3 críticas)</span>
+                    </p>
+                    <a sec:authorize="isAuthenticated()" th:href="@{/obras/{id}(id=${obra.id})}"
+                       th:attr="aria-label=|Ver detalhes de ${obra.titulo}|">Ver detalhes</a>
+                </article>
+            </li>
+        </ul>
+    </section>
+
+    <section class="container secao" aria-labelledby="titulo-como">
+        <h2 id="titulo-como">Como funciona</h2>
+        <ol class="passos">
+            <li><strong>Explore</strong> o catálogo de filmes, séries e livros, mesmo sem conta.</li>
+            <li><strong>Crie sua conta</strong> para ver os detalhes e as críticas de cada obra.</li>
+            <li><strong>Avalie</strong> com uma nota de 1 a 5 estrelas e um comentário.</li>
+        </ol>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>

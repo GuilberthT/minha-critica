@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Catálogo')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" tabindex="-1" class="container secao">
+    <h1>Catálogo de obras</h1>
+
+    <div th:replace="~{fragments/layout :: mensagens}"></div>
+
+    <form th:action="@{/obras}" method="get" class="filtros" role="search" aria-label="Buscar obras">
+        <div class="campo">
+            <label for="q">Buscar por título</label>
+            <input type="search" id="q" name="q" th:value="${q}" placeholder="Ex.: Dom Casmurro">
+        </div>
+        <div class="campo">
+            <label for="tipo">Tipo</label>
+            <select id="tipo" name="tipo">
+                <option value="">Todos</option>
+                <option th:each="t : ${tipos}" th:value="${t}" th:text="${t.descricao}"
+                        th:selected="${t == tipoSelecionado}">Filme</option>
+            </select>
+        </div>
+        <button type="submit" class="botao botao-primario">Filtrar</button>
+    </form>
+
+    <p sec:authorize="isAnonymous()" class="caixa-info">
+        <a th:href="@{/login}">Entre</a> ou <a th:href="@{/cadastro}">crie uma conta</a>
+        para ver os detalhes e as críticas de cada obra.
+    </p>
+
+    <p class="texto-suave" role="status" aria-live="polite"
+       th:text="${#lists.size(obras)} == 1 ? '1 obra encontrada' : |${#lists.size(obras)} obras encontradas|">
+        0 obras encontradas
+    </p>
+
+    <ul class="grade-cards" th:unless="${#lists.isEmpty(obras)}">
+        <li th:each="obra : ${obras}" class="card">
+            <article>
+                <p class="etiqueta" th:text="${obra.tipo.descricao}">Filme</p>
+                <h2 class="card-titulo" th:text="${obra.titulo}">Título</h2>
+                <p class="texto-suave">
+                    <span th:text="${obra.genero}">Drama</span> ·
+                    <span th:text="${obra.anoLancamento}">2000</span>
+                    <span th:if="${obra.autorOuDiretor}" th:text="|· ${obra.autorOuDiretor}|"></span>
+                </p>
+                <p class="media">
+                    <span aria-hidden="true">★</span>
+                    <span th:text="${obra.mediaFormatada}">4,5</span>
+                    <span class="texto-suave" th:text="|(${obra.textoCriticas})|">(3 críticas)</span>
+                </p>
+                <a sec:authorize="isAuthenticated()" th:href="@{/obras/{id}(id=${obra.id})}"
+                   th:attr="aria-label=|Ver detalhes de ${obra.titulo}|">Ver detalhes e críticas</a>
+            </article>
+        </li>
+    </ul>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>

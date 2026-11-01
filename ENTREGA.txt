@@ -1,0 +1,22 @@
+ENTREGA FINAL DO TRABALHO PRÁTICO — MINHA CRÍTICA
+
+Grupo: Minha Crítica
+Integrantes:
+- Guilberth William Ferreira Tavares
+- Pedro Paulo Pereira Lacerda
+- Lucas Gonçalves Cavanha
+
+1. Código-fonte: arquivo minha-critica.zip (este pacote)
+   Repositório público: https://github.com/____________/minha-critica
+
+2. Slides da apresentação: ____________ (link ou arquivo .pptx/.pdf enviado junto)
+
+3. Documentação: README.md e pasta docs/
+   - 01-regras-de-negocio.md
+   - 02-casos-de-uso.md + diagrama-casos-de-uso.png/.svg
+   - 03-arquitetura.md (camadas, modelo de dados, rotas, diferenciais)
+   - 04-seguranca-acessibilidade.md (Spring Security e WCAG AA)
+   - 05-divisao-de-tarefas.md
+
+Como executar: mvn spring-boot:run  →  http://localhost:8080
+Admin: admin@minhacritica.com / admin123   Usuário: ana@minhacritica.com / user123

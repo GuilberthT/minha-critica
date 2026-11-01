@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${obra.id == null} ? 'Nova obra' : 'Editar obra')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" tabindex="-1" class="container container-medio secao">
+    <nav aria-label="Trilha de navegação" class="trilha">
+        <ol>
+            <li><a th:href="@{/admin/obras}">Gerenciar obras</a></li>
+            <li aria-current="page" th:text="${obra.id == null} ? 'Nova obra' : 'Editar obra'">Nova obra</li>
+        </ol>
+    </nav>
+
+    <h1 th:text="${obra.id == null} ? 'Nova obra' : |Editar “${obra.titulo}”|">Nova obra</h1>
+    <p class="texto-suave">Campos marcados com <span aria-hidden="true">*</span><span class="sr-only">asterisco</span> são obrigatórios.</p>
+
+    <form th:action="${obra.id == null} ? @{/admin/obras} : @{/admin/obras/{id}(id=${obra.id})}"
+          th:object="${obra}" method="post" class="formulario" novalidate>
+
+        <div th:if="${#fields.hasGlobalErrors()}" class="alerta alerta-erro" role="alert">
+            <p th:each="e : ${#fields.globalErrors()}" th:text="${e}">Erro</p>
+        </div>
+
+        <div class="campo">
+            <label for="titulo">Título <span aria-hidden="true">*</span></label>
+            <input type="text" id="titulo" th:field="*{titulo}" required maxlength="150"
+                   th:attr="aria-invalid=${#fields.hasErrors('titulo')},aria-describedby=${#fields.hasErrors('titulo')} ? 'erro-titulo' : null">
+            <p id="erro-titulo" class="erro-campo" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></p>
+        </div>
+
+        <div class="linha-campos">
+            <div class="campo">
+                <label for="tipo">Tipo <span aria-hidden="true">*</span></label>
+                <select id="tipo" th:field="*{tipo}" required
+                        th:attr="aria-invalid=${#fields.hasErrors('tipo')},aria-describedby=${#fields.hasErrors('tipo')} ? 'erro-tipo' : null">
+                    <option value="">Selecione…</option>
+                    <option th:each="t : ${tipos}" th:value="${t}" th:text="${t.descricao}">Filme</option>
+                </select>
+                <p id="erro-tipo" class="erro-campo" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></p>
+            </div>
+
+            <div class="campo">
+                <label for="genero">Gênero <span aria-hidden="true">*</span></label>
+                <input type="text" id="genero" th:field="*{genero}" required maxlength="60"
+                       th:attr="aria-invalid=${#fields.hasErrors('genero')},aria-describedby=${#fields.hasErrors('genero')} ? 'erro-genero' : null">
+                <p id="erro-genero" class="erro-campo" th:if="${#fields.hasErrors('genero')}" th:errors="*{genero}"></p>
+            </div>
+
+            <div class="campo">
+                <label for="anoLancamento">Ano <span aria-hidden="true">*</span></label>
+                <input type="number" id="anoLancamento" th:field="*{anoLancamento}" required min="1800" max="2100"
+                       th:attr="aria-invalid=${#fields.hasErrors('anoLancamento')},aria-describedby=${#fields.hasErrors('anoLancamento')} ? 'erro-ano' : null">
+                <p id="erro-ano" class="erro-campo" th:if="${#fields.hasErrors('anoLancamento')}" th:errors="*{anoLancamento}"></p>
+            </div>
+        </div>
+
+        <div class="campo">
+            <label for="autorOuDiretor">Autor(a) / Direção</label>
+            <input type="text" id="autorOuDiretor" th:field="*{autorOuDiretor}" maxlength="100"
+                   aria-describedby="dica-autor">
+            <p id="dica-autor" class="dica">Opcional. Para livros, o autor; para filmes e séries, quem dirigiu ou criou.</p>
+        </div>
+
+        <div class="campo">
+            <label for="sinopse">Sinopse <span aria-hidden="true">*</span></label>
+            <textarea id="sinopse" th:field="*{sinopse}" rows="6" required maxlength="2000"
+                      data-contador="contador-sinopse"
+                      th:attr="aria-invalid=${#fields.hasErrors('sinopse')},aria-describedby=${#fields.hasErrors('sinopse')} ? 'erro-sinopse contador-sinopse' : 'contador-sinopse'"></textarea>
+            <p id="contador-sinopse" class="dica" aria-live="polite">Entre 20 e 2000 caracteres.</p>
+            <p id="erro-sinopse" class="erro-campo" th:if="${#fields.hasErrors('sinopse')}" th:errors="*{sinopse}"></p>
+        </div>
+
+        <div class="acoes">
+            <button type="submit" class="botao botao-primario"
+                    th:text="${obra.id == null} ? 'Cadastrar obra' : 'Salvar alterações'">Salvar</button>
+            <a th:href="@{/admin/obras}" class="botao botao-secundario">Cancelar</a>
+        </div>
+    </form>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>

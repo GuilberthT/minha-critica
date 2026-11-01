@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!-- Cabeçalho HTML comum a todas as páginas -->
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' | Minha Crítica'">Minha Crítica</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+
+<body>
+
+<!-- Topo do site: link de pular conteúdo + navegação principal -->
+<header th:fragment="cabecalho" class="topo">
+    <a href="#conteudo" class="pular-link">Pular para o conteúdo principal</a>
+    <div class="container topo-conteudo">
+        <a th:href="@{/}" class="logo" aria-label="Minha Crítica, página inicial">
+            <span aria-hidden="true">★</span> Minha Crítica
+        </a>
+        <nav aria-label="Navegação principal">
+            <ul class="menu">
+                <li><a th:href="@{/obras}">Catálogo</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/obras}">Gerenciar obras</a></li>
+                <li sec:authorize="isAnonymous()"><a th:href="@{/login}">Entrar</a></li>
+                <li sec:authorize="isAnonymous()"><a th:href="@{/cadastro}" class="botao botao-claro">Criar conta</a></li>
+                <li sec:authorize="isAuthenticated()" class="usuario-menu">
+                    <span>
+                        Olá, <strong sec:authentication="principal.nome">Usuário</strong>
+                        <span class="selo" sec:authorize="hasRole('ADMIN')">Admin</span>
+                    </span>
+                    <form th:action="@{/logout}" method="post" class="form-inline">
+                        <button type="submit" class="botao botao-claro">Sair</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- Mensagens de feedback (anunciadas por leitores de tela) -->
+<div th:fragment="mensagens" class="mensagens">
+    <div th:if="${sucesso}" class="alerta alerta-sucesso" role="status" aria-live="polite" th:text="${sucesso}"></div>
+    <div th:if="${erro}" class="alerta alerta-erro" role="alert" th:text="${erro}"></div>
+</div>
+
+<!-- Estrelas da nota com texto alternativo para leitores de tela -->
+<span th:fragment="estrelas(nota)" class="estrelas" role="img"
+      th:attr="aria-label=|Nota ${nota} de 5|">
+    <span aria-hidden="true" th:each="i : ${#numbers.sequence(1, 5)}"
+          th:text="${i <= nota} ? '★' : '☆'">★</span>
+</span>
+
+<!-- Rodapé -->
+<footer th:fragment="rodape" class="rodape">
+    <div class="container">
+        <p>Minha Crítica — Trabalho Prático de Desenvolvimento Web com Spring Boot (UFMS, 2026).</p>
+        <p>Grupo: Guilberth Tavares, Pedro Paulo Lacerda e Lucas Gonçalves.</p>
+    </div>
+</footer>
+
+</body>
+</html>

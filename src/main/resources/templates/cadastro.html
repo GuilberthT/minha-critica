@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Criar conta')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" tabindex="-1" class="container container-estreito">
+    <h1>Criar conta</h1>
+    <p class="texto-suave">Todos os campos são obrigatórios.</p>
+
+    <form th:action="@{/cadastro}" th:object="${form}" method="post" class="formulario" novalidate>
+        <div th:if="${#fields.hasGlobalErrors()}" class="alerta alerta-erro" role="alert">
+            <p th:each="e : ${#fields.globalErrors()}" th:text="${e}">Erro</p>
+        </div>
+
+        <div class="campo">
+            <label for="nome">Nome</label>
+            <input type="text" id="nome" th:field="*{nome}" required autocomplete="name"
+                   th:attr="aria-invalid=${#fields.hasErrors('nome')},aria-describedby=${#fields.hasErrors('nome')} ? 'erro-nome' : null">
+            <p id="erro-nome" class="erro-campo" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
+        </div>
+
+        <div class="campo">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" th:field="*{email}" required autocomplete="email"
+                   th:attr="aria-invalid=${#fields.hasErrors('email')},aria-describedby=${#fields.hasErrors('email')} ? 'erro-email' : null">
+            <p id="erro-email" class="erro-campo" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+        </div>
+
+        <div class="campo">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" th:field="*{senha}" required minlength="6" autocomplete="new-password"
+                   th:attr="aria-invalid=${#fields.hasErrors('senha')},aria-describedby=${#fields.hasErrors('senha')} ? 'erro-senha dica-senha' : 'dica-senha'">
+            <p id="dica-senha" class="dica">Mínimo de 6 caracteres.</p>
+            <p id="erro-senha" class="erro-campo" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></p>
+        </div>
+
+        <div class="campo">
+            <label for="confirmacaoSenha">Confirmar senha</label>
+            <input type="password" id="confirmacaoSenha" th:field="*{confirmacaoSenha}" required autocomplete="new-password"
+                   th:attr="aria-invalid=${#fields.hasErrors('confirmacaoSenha')},aria-describedby=${#fields.hasErrors('confirmacaoSenha')} ? 'erro-confirmacao' : null">
+            <p id="erro-confirmacao" class="erro-campo" th:if="${#fields.hasErrors('confirmacaoSenha')}"
+               th:errors="*{confirmacaoSenha}"></p>
+        </div>
+
+        <button type="submit" class="botao botao-primario">Criar conta</button>
+    </form>
+
+    <p>Já tem conta? <a th:href="@{/login}">Entrar</a>.</p>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>

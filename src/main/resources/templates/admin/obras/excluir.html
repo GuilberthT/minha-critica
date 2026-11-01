@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Excluir obra')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" tabindex="-1" class="container container-estreito secao">
+    <h1>Excluir obra</h1>
+
+    <div class="alerta alerta-aviso" role="alert">
+        <p>
+            Tem certeza que deseja excluir <strong th:text="${obra.titulo}">Título</strong>
+            (<span th:text="${obra.tipo.descricao}">Filme</span>, <span th:text="${obra.anoLancamento}">2000</span>)?
+        </p>
+        <p th:if="${obra.totalCriticas > 0}"
+           th:text="${obra.totalCriticas == 1} ? 'A crítica desta obra também será apagada.' : |As ${obra.totalCriticas} críticas desta obra também serão apagadas.|">As críticas também serão apagadas.</p>
+        <p>Esta ação não pode ser desfeita.</p>
+    </div>
+
+    <form th:action="@{/admin/obras/{id}/excluir(id=${obra.id})}" method="post" class="acoes">
+        <button type="submit" class="botao botao-perigo">Sim, excluir</button>
+        <a th:href="@{/admin/obras}" class="botao botao-secundario">Cancelar</a>
+    </form>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Entrar')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" tabindex="-1" class="container container-estreito">
+    <h1>Entrar</h1>
+
+    <div th:replace="~{fragments/layout :: mensagens}"></div>
+    <p th:if="${param.erro}" class="alerta alerta-erro" role="alert">E-mail ou senha incorretos.</p>
+
+    <form th:action="@{/login}" method="post" class="formulario" novalidate>
+        <div class="campo">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" required autocomplete="email" autofocus>
+        </div>
+        <div class="campo">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" name="senha" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="botao botao-primario">Entrar</button>
+    </form>
+
+    <p>Ainda não tem conta? <a th:href="@{/cadastro}">Cadastre-se</a>.</p>
+
+    <aside class="caixa-info" aria-labelledby="titulo-teste">
+        <h2 id="titulo-teste">Contas de demonstração</h2>
+        <ul>
+            <li>Administrador: <code>admin@minhacritica.com</code> / <code>admin123</code></li>
+            <li>Usuário: <code>ana@minhacritica.com</code> / <code>user123</code></li>
+        </ul>
+    </aside>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>

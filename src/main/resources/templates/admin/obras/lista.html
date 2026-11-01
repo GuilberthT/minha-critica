@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Gerenciar obras')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" tabindex="-1" class="container secao">
+    <div class="titulo-com-acao">
+        <h1>Gerenciar obras</h1>
+        <a th:href="@{/admin/obras/nova}" class="botao botao-primario">+ Nova obra</a>
+    </div>
+
+    <div th:replace="~{fragments/layout :: mensagens}"></div>
+
+    <p th:if="${#lists.isEmpty(obras)}">Nenhuma obra cadastrada. Comece clicando em “Nova obra”.</p>
+
+    <div class="tabela-rolagem" th:unless="${#lists.isEmpty(obras)}" tabindex="0"
+         aria-labelledby="legenda-obras" role="region">
+        <table class="tabela">
+            <caption id="legenda-obras" th:text="|${#lists.size(obras)} obras cadastradas|">Obras cadastradas</caption>
+            <thead>
+            <tr>
+                <th scope="col">Título</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Gênero</th>
+                <th scope="col">Ano</th>
+                <th scope="col">Média</th>
+                <th scope="col">Críticas</th>
+                <th scope="col"><span class="sr-only">Ações</span></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="obra : ${obras}">
+                <th scope="row">
+                    <a th:href="@{/obras/{id}(id=${obra.id})}" th:text="${obra.titulo}">Título</a>
+                </th>
+                <td th:text="${obra.tipo.descricao}">Filme</td>
+                <td th:text="${obra.genero}">Drama</td>
+                <td th:text="${obra.anoLancamento}">2000</td>
+                <td th:text="${obra.mediaFormatada}">4,5</td>
+                <td th:text="${obra.totalCriticas}">3</td>
+                <td class="acoes-tabela">
+                    <a th:href="@{/admin/obras/{id}/editar(id=${obra.id})}"
+                       th:attr="aria-label=|Editar ${obra.titulo}|">Editar</a>
+                    <a th:href="@{/admin/obras/{id}/excluir(id=${obra.id})}" class="perigo"
+                       th:attr="aria-label=|Excluir ${obra.titulo}|">Excluir</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>

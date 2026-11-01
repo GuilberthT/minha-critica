@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Página não encontrada')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: cabecalho}"></header>
+
+<main id="conteudo" tabindex="-1" class="container container-estreito secao centro">
+    <p class="codigo-erro" aria-hidden="true">404</p>
+    <h1>Página não encontrada</h1>
+    <p>O endereço que você acessou não existe ou a obra foi removida.</p>
+    <a th:href="@{/obras}" class="botao botao-primario">Voltar ao catálogo</a>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>
