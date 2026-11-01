@@ -42,6 +42,7 @@ senha (BCrypt)              genero                        data_criacao
 perfil (ROLE_USER/ADMIN)    ano_lancamento                autor_id (FK → usuarios)
 criado_em                   autor_ou_diretor              obra_id  (FK → obras)
                             sinopse                       UNIQUE (autor_id, obra_id)
+                            capa_url (opcional)
                             criado_em
 ```
 
@@ -68,6 +69,8 @@ As tabelas são criadas automaticamente pelo Hibernate (`spring.jpa.hibernate.dd
 
 ## Diferenciais implementados
 
+- Interface em tema escuro centrada nas capas: página inicial com a obra mais bem avaliada em destaque, catálogo em grade de pôsteres, gráfico de distribuição das notas e estrelas clicáveis.
+- Capa por URL opcional; sem ela, o site desenha uma capa própria com a cor do tipo de obra.
 - Busca por título e filtro por tipo no catálogo.
 - Média de notas e contagem de críticas por obra.
 - Moderação de críticas pelo administrador.

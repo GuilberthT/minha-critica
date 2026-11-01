@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 public class CriticaService {
 
@@ -23,6 +25,11 @@ public class CriticaService {
         this.criticaRepository = criticaRepository;
         this.obraService = obraService;
         this.usuarioService = usuarioService;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Critica> recentes() {
+        return criticaRepository.findTop4ByOrderByDataCriacaoDesc();
     }
 
     @Transactional(readOnly = true)

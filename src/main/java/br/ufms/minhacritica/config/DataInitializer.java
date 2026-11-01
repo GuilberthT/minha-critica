@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Popula o banco na primeira execução com usuários de teste, obras e críticas,
@@ -35,12 +36,37 @@ public class DataInitializer implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Capas das obras de demonstração (imagens hospedadas na Wikipédia/Wikimedia Commons).
+     * Sintonia fica de fora de propósito: mostra a capa desenhada pelo próprio site.
+     */
+    private static final Map<String, String> CAPAS = Map.of(
+            "Cidade de Deus", "https://upload.wikimedia.org/wikipedia/pt/1/10/CidadedeDeus.jpg",
+            "Central do Brasil", "https://upload.wikimedia.org/wikipedia/pt/2/29/Central_do_Brasil_poster.jpg",
+            "O Auto da Compadecida", "https://upload.wikimedia.org/wikipedia/pt/b/bf/O_auto_da_compadecida.jpg",
+            "Cangaço Novo", "https://upload.wikimedia.org/wikipedia/pt/7/7b/Canga%C3%A7o_Novo.jpg",
+            "Dom Casmurro", "https://upload.wikimedia.org/wikipedia/commons/0/05/DomCasmurroMachadodeAssis.jpg",
+            "Vidas Secas", "https://upload.wikimedia.org/wikipedia/commons/7/74/Vidas_Secas_de_Graciliano_Ramos_-_Capa_da_1%C2%AA_edi%C3%A7%C3%A3o_pela_Jos%C3%A9_Olympio_%281938%29.jpg",
+            "Torto Arado", "https://upload.wikimedia.org/wikipedia/pt/6/68/Capa_Livro_Torto_Arado.jpg"
+    );
+
     @Override
     @Transactional
     public void run(String... args) {
-        if (usuarioRepository.count() > 0) {
-            return;
+        if (usuarioRepository.count() == 0) {
+            criarDadosIniciais();
         }
+        preencherCapas();
+    }
+
+    /** Coloca a capa nas obras de demonstração que ainda não têm uma (nunca sobrescreve a do admin). */
+    private void preencherCapas() {
+        obraRepository.findAll().stream()
+                .filter(obra -> !obra.isTemCapa() && CAPAS.containsKey(obra.getTitulo()))
+                .forEach(obra -> obra.setCapaUrl(CAPAS.get(obra.getTitulo())));
+    }
+
+    private void criarDadosIniciais() {
         log.info("Banco vazio: criando dados iniciais de demonstração.");
 
         usuarioRepository.save(new Usuario("Administrador", "admin@minhacritica.com",

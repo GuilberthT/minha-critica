@@ -20,6 +20,7 @@
             <caption id="legenda-obras" th:text="|${#lists.size(obras)} obras cadastradas|">Obras cadastradas</caption>
             <thead>
             <tr>
+                <th scope="col"><span class="sr-only">Capa</span></th>
                 <th scope="col">Título</th>
                 <th scope="col">Tipo</th>
                 <th scope="col">Gênero</th>
@@ -31,6 +32,9 @@
             </thead>
             <tbody>
             <tr th:each="obra : ${obras}">
+                <td class="col-capa" aria-hidden="true">
+                    <div th:replace="~{fragments/layout :: capa(${obra}, '')}"></div>
+                </td>
                 <th scope="row">
                     <a th:href="@{/obras/{id}(id=${obra.id})}" th:text="${obra.titulo}">Título</a>
                 </th>

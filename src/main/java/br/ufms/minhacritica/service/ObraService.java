@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -70,6 +71,7 @@ public class ObraService {
         obra.setAnoLancamento(dados.getAnoLancamento());
         obra.setAutorOuDiretor(dados.getAutorOuDiretor());
         obra.setSinopse(dados.getSinopse());
+        obra.setCapaUrl(dados.getCapaUrl());
         return obra;
     }
 
@@ -86,5 +88,20 @@ public class ObraService {
             String autor = obra.getAutorOuDiretor().trim();
             obra.setAutorOuDiretor(autor.isEmpty() ? null : autor);
         }
+        if (obra.getCapaUrl() != null) {
+            String capa = obra.getCapaUrl().trim();
+            obra.setCapaUrl(capa.isEmpty() ? null : capa);
+        }
+    }
+
+    /** Obras com pelo menos uma crítica, da maior para a menor média (desempate: mais críticas). */
+    @Transactional(readOnly = true)
+    public List<Obra> maisBemAvaliadas(int limite) {
+        return obraRepository.findAll().stream()
+                .filter(o -> o.getTotalCriticas() > 0)
+                .sorted(Comparator.comparingDouble(Obra::getMediaNotas).reversed()
+                        .thenComparing(Comparator.comparingInt(Obra::getTotalCriticas).reversed()))
+                .limit(limite)
+                .toList();
     }
 }

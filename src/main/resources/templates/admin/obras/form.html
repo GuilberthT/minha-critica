@@ -71,6 +71,14 @@
             <p id="erro-sinopse" class="erro-campo" th:if="${#fields.hasErrors('sinopse')}" th:errors="*{sinopse}"></p>
         </div>
 
+        <div class="campo">
+            <label for="capaUrl">Endereço da imagem da capa</label>
+            <input type="url" id="capaUrl" th:field="*{capaUrl}" maxlength="500" placeholder="https://…"
+                   th:attr="aria-invalid=${#fields.hasErrors('capaUrl')},aria-describedby=${#fields.hasErrors('capaUrl')} ? 'erro-capa dica-capa' : 'dica-capa'">
+            <p id="dica-capa" class="dica">Opcional. Cole o link de uma imagem (JPG, PNG ou WebP). Sem ele, o site desenha uma capa com o título.</p>
+            <p id="erro-capa" class="erro-campo" th:if="${#fields.hasErrors('capaUrl')}" th:errors="*{capaUrl}"></p>
+        </div>
+
         <div class="acoes">
             <button type="submit" class="botao botao-primario"
                     th:text="${obra.id == null} ? 'Cadastrar obra' : 'Salvar alterações'">Salvar</button>

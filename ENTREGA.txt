@@ -9,7 +9,7 @@ Integrantes:
 1. Código-fonte: arquivo minha-critica.zip (este pacote)
    Repositório público: https://github.com/GuilberthT/minha-critica
 
-2. Slides da apresentação: ____________ (link ou arquivo .pptx/.pdf enviado junto)
+2. Slides da apresentação: arquivo PDF enviado junto (Minha Crítica - Apresentação)
 
 3. Documentação: README.md e pasta docs/
    - 01-regras-de-negocio.md

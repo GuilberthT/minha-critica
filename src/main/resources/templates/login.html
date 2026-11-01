@@ -4,8 +4,15 @@
 <body>
 <header th:replace="~{fragments/layout :: cabecalho}"></header>
 
-<main id="conteudo" tabindex="-1" class="container container-estreito">
+<main id="conteudo" tabindex="-1" class="container auth-grade">
+    <div class="mural" aria-hidden="true">
+        <div th:each="obra, it : ${mural}" th:if="${it.index < 6}" class="mural-item">
+            <div th:replace="~{fragments/layout :: capa(${obra}, '')}"></div>
+        </div>
+    </div>
+    <div class="auth-caixa">
     <h1>Entrar</h1>
+    <p class="texto-suave">Bom te ver de novo. Entre para ler e escrever críticas.</p>
 
     <div th:replace="~{fragments/layout :: mensagens}"></div>
     <p th:if="${param.erro}" class="alerta alerta-erro" role="alert">E-mail ou senha incorretos.</p>
@@ -31,6 +38,7 @@
             <li>Usuário: <code>ana@minhacritica.com</code> / <code>user123</code></li>
         </ul>
     </aside>
+    </div>
 </main>
 
 <footer th:replace="~{fragments/layout :: rodape}"></footer>

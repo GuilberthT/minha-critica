@@ -5,69 +5,93 @@
 <body>
 <header th:replace="~{fragments/layout :: cabecalho}"></header>
 
-<main id="conteudo" tabindex="-1" class="container secao">
-    <nav aria-label="Trilha de navegação" class="trilha">
-        <ol>
-            <li><a th:href="@{/obras}">Catálogo</a></li>
-            <li aria-current="page" th:text="${obra.titulo}">Título</li>
-        </ol>
-    </nav>
+<main id="conteudo" tabindex="-1">
+    <!-- Faixa de fundo tingida com a cor da capa -->
+    <div class="obra-faixa" aria-hidden="true" th:style="'--matiz:' + ${obra.matizCapa}"></div>
 
-    <div th:replace="~{fragments/layout :: mensagens}"></div>
+    <div class="container obra-grade">
+        <nav aria-label="Trilha de navegação" class="trilha">
+            <ol>
+                <li><a th:href="@{/obras}">Catálogo</a></li>
+                <li aria-current="page" th:text="${obra.titulo}">Título</li>
+            </ol>
+        </nav>
 
-    <article class="obra-detalhe">
-        <p class="etiqueta" th:text="${obra.tipo.descricao}">Filme</p>
-        <h1 th:text="${obra.titulo}">Título</h1>
-        <dl class="ficha">
-            <div><dt>Gênero</dt><dd th:text="${obra.genero}">Drama</dd></div>
-            <div><dt>Ano</dt><dd th:text="${obra.anoLancamento}">2000</dd></div>
-            <div th:if="${obra.autorOuDiretor}">
-                <dt th:text="${obra.tipo.name() == 'LIVRO'} ? 'Autor(a)' : 'Direção / criação'">Direção</dt>
-                <dd th:text="${obra.autorOuDiretor}">Nome</dd>
-            </div>
-            <div>
-                <dt>Média</dt>
-                <dd>
-                    <strong th:text="${obra.mediaFormatada}">4,5</strong>
-                    <span th:text="|de 5 (${obra.textoCriticas})|">de 5</span>
-                </dd>
-            </div>
-        </dl>
-        <h2>Sinopse</h2>
-        <p th:text="${obra.sinopse}">Sinopse</p>
+        <div class="obra-capa">
+            <div th:replace="~{fragments/layout :: capa(${obra}, |Capa de ${obra.titulo}|)}"></div>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/obras/{id}/editar(id=${obra.id})}"
+               class="botao botao-secundario botao-largo">Editar obra</a>
+        </div>
 
-        <p sec:authorize="hasRole('ADMIN')" class="acoes">
-            <a th:href="@{/admin/obras/{id}/editar(id=${obra.id})}" class="botao botao-secundario">Editar obra</a>
-        </p>
-    </article>
+        <article class="obra-info" aria-labelledby="titulo-obra">
+            <div th:replace="~{fragments/layout :: mensagens}"></div>
+            <h1 id="titulo-obra">
+                <span th:text="${obra.titulo}">Título</span>
+                <span class="obra-ano" th:text="${obra.anoLancamento}">2000</span>
+            </h1>
+            <p class="obra-autor" th:if="${obra.autorOuDiretor}">
+                <span th:text="${obra.tipo.name() == 'LIVRO'} ? 'Escrito por' : (${obra.tipo.name() == 'SERIE'} ? 'Criado por' : 'Dirigido por')">Dirigido por</span>
+                <strong th:text="${obra.autorOuDiretor}">Nome</strong>
+            </p>
+            <ul class="obra-etiquetas" aria-label="Classificação">
+                <li th:text="${obra.tipo.descricao}">Filme</li>
+                <li th:text="${obra.genero}">Drama</li>
+            </ul>
+            <p class="obra-sinopse" th:text="${obra.sinopse}">Sinopse</p>
+        </article>
 
-    <section id="criticas" aria-labelledby="titulo-criticas" class="secao">
-        <h2 id="titulo-criticas">Críticas</h2>
+        <aside class="obra-notas" aria-labelledby="titulo-notas">
+            <h2 id="titulo-notas">Notas</h2>
+            <p class="nota-resumo">
+                <span class="nota-grande" th:text="${obra.mediaFormatada}">4,5</span>
+                <span>
+                    <span class="nota-de">média de 5</span>
+                    <span class="texto-suave" th:text="${obra.textoCriticas}">2 críticas</span>
+                </span>
+            </p>
+            <ul class="distribuicao" th:if="${obra.totalCriticas > 0}">
+                <li th:each="n : ${#numbers.sequence(5, 1, -1)}">
+                    <span class="dist-rotulo" aria-hidden="true" th:text="|${n} ★|">5 ★</span>
+                    <span class="dist-barra" aria-hidden="true">
+                        <span th:style="'width:' + ${obra.percentualNota(n)} + '%'"></span>
+                    </span>
+                    <span class="dist-qtd" aria-hidden="true" th:text="${obra.contagemNota(n)}">0</span>
+                    <span class="sr-only"
+                          th:text="|${n} ${n == 1 ? 'estrela' : 'estrelas'}: ${obra.contagemNota(n)} ${obra.contagemNota(n) == 1 ? 'crítica' : 'críticas'}|">5 estrelas: 0 críticas</span>
+                </li>
+            </ul>
+        </aside>
+    </div>
+
+    <section id="criticas" aria-labelledby="titulo-criticas" class="container obra-criticas">
+        <h2 id="titulo-criticas" th:text="|Críticas (${obra.totalCriticas})|">Críticas</h2>
 
         <!-- Formulário de nova crítica (RN03: uma por usuário) -->
         <div th:unless="${jaCriticou}" class="caixa-form">
-            <h3>Escreva sua crítica</h3>
+            <h3>Qual a sua nota?</h3>
             <form th:action="@{/obras/{id}/criticas(id=${obra.id})}" th:object="${criticaForm}"
                   method="post" class="formulario" novalidate>
                 <fieldset class="nota-estrelas"
                           th:attr="aria-describedby=${#fields.hasErrors('nota')} ? 'erro-nota' : null">
-                    <legend>Nota</legend>
+                    <legend>Nota de 1 a 5 estrelas</legend>
                     <div class="opcoes-nota">
                         <th:block th:each="n : ${#numbers.sequence(1, 5)}">
                             <input type="radio" name="nota" th:id="|nota-${n}|" th:value="${n}"
                                    th:checked="${criticaForm.nota == n}" required>
                             <label th:for="|nota-${n}|">
-                                <span aria-hidden="true" th:text="${n} + ' ★'">1 ★</span>
+                                <span aria-hidden="true">★</span>
                                 <span class="sr-only" th:text="${n} == 1 ? '1 estrela' : |${n} estrelas|">1 estrela</span>
                             </label>
                         </th:block>
+                        <span class="nota-escolhida" aria-hidden="true" data-nota-texto>Escolha uma nota</span>
                     </div>
                     <p id="erro-nota" class="erro-campo" th:if="${#fields.hasErrors('nota')}" th:errors="*{nota}"></p>
                 </fieldset>
 
                 <div class="campo">
-                    <label for="comentario">Comentário</label>
+                    <label for="comentario">Sua crítica</label>
                     <textarea id="comentario" th:field="*{comentario}" rows="4" maxlength="1000" required
+                              placeholder="O que você achou?"
                               data-contador="contador-comentario"
                               th:attr="aria-invalid=${#fields.hasErrors('comentario')},aria-describedby=${#fields.hasErrors('comentario')} ? 'erro-comentario contador-comentario' : 'contador-comentario'"></textarea>
                     <p id="contador-comentario" class="dica" aria-live="polite">Entre 10 e 1000 caracteres.</p>
@@ -78,20 +102,25 @@
                 <button type="submit" class="botao botao-primario">Publicar crítica</button>
             </form>
         </div>
-        <p th:if="${jaCriticou}" class="caixa-info">Você já avaliou esta obra. Obrigado pela crítica!</p>
+        <p th:if="${jaCriticou}" class="caixa-info">Você já avaliou esta obra. Sua crítica está na lista abaixo.</p>
 
-        <p th:if="${#lists.isEmpty(obra.criticas)}">Ainda não há críticas. Seja a primeira pessoa a avaliar!</p>
+        <p th:if="${#lists.isEmpty(obra.criticas)}" class="vazio">Ninguém avaliou esta obra ainda. A primeira crítica pode ser a sua.</p>
 
         <ul class="lista-criticas" th:unless="${#lists.isEmpty(obra.criticas)}">
-            <li th:each="c : ${obra.criticas}" class="critica">
+            <li th:each="c : ${obra.criticas}" class="critica"
+                th:classappend="${#authentication.principal.id == c.autor.id} ? 'critica-minha'">
                 <article>
                     <header class="critica-topo">
-                        <h3 class="critica-autor" th:text="${c.autor.nome}">Autor</h3>
+                        <span class="avatar" aria-hidden="true" th:text="${#strings.substring(c.autor.nome, 0, 1)}">A</span>
+                        <h3 class="critica-autor">
+                            <span th:text="${c.autor.nome}">Autor</span>
+                            <span th:if="${#authentication.principal.id == c.autor.id}" class="selo-voce">você</span>
+                        </h3>
                         <span th:replace="~{fragments/layout :: estrelas(${c.nota})}"></span>
                         <time th:datetime="${#temporals.format(c.dataCriacao, 'yyyy-MM-dd')}"
                               th:text="${#temporals.format(c.dataCriacao, 'dd/MM/yyyy')}">01/01/2026</time>
                     </header>
-                    <p th:text="${c.comentario}">Comentário</p>
+                    <p class="critica-texto" th:text="${c.comentario}">Comentário</p>
 
                     <!-- RN04: autor exclui a própria crítica; admin exclui qualquer uma -->
                     <form th:if="${#authentication.principal.id == c.autor.id or #authentication.principal.admin}"

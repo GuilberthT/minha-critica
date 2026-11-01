@@ -25,4 +25,4 @@ cadastrados leem as críticas e publicam as suas, com nota de 1 a 5 estrelas. Ca
 | RN06 | A média de notas de uma obra é calculada a partir das críticas; sem críticas, exibe “–”. | `Obra.getMediaNotas` |
 | RN07 | Não pode haver duas obras com o mesmo título, tipo e ano. | `ObraService.criar/atualizar` |
 | RN08 | O e-mail é único; a senha tem no mínimo 6 caracteres, precisa ser confirmada e é salva com hash BCrypt. | `UsuarioService`, `CadastroForm` |
-| RN09 | Obra exige título (até 150), tipo (Filme, Série ou Livro), gênero, ano entre 1800 e 2100 e sinopse de 20 a 2000 caracteres. | Anotações de validação em `Obra` |
+| RN09 | Obra exige título (até 150), tipo (Filme, Série ou Livro), gênero, ano entre 1800 e 2100 e sinopse de 20 a 2000 caracteres. A capa é opcional e, se informada, precisa ser um endereço http(s). | Anotações de validação em `Obra` |

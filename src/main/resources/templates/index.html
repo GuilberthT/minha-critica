@@ -6,52 +6,105 @@
 <header th:replace="~{fragments/layout :: cabecalho}"></header>
 
 <main id="conteudo" tabindex="-1">
-    <section class="hero" aria-labelledby="titulo-hero">
-        <div class="container">
-            <h1 id="titulo-hero">Sua opinião sobre filmes, séries e livros em um só lugar</h1>
-            <p class="hero-texto">
-                O <strong>Minha Crítica</strong> reúne obras brasileiras e do mundo todo para você descobrir,
-                avaliar com estrelas e ler o que outras pessoas acharam.
-            </p>
-            <div class="acoes">
-                <a th:href="@{/obras}" class="botao botao-primario">Ver catálogo</a>
-                <a sec:authorize="isAnonymous()" th:href="@{/cadastro}" class="botao botao-secundario">Criar conta grátis</a>
+    <div class="container">
+        <p th:if="${param.saiu}" class="alerta alerta-sucesso" role="status">Você saiu da sua conta.</p>
+    </div>
+
+    <!-- Destaque: a obra mais bem avaliada pela comunidade -->
+    <section th:if="${destaque}" class="destaque" aria-labelledby="titulo-destaque"
+             th:style="'--matiz:' + ${destaque.matizCapa}">
+        <div class="container destaque-grade">
+            <div th:replace="~{fragments/layout :: capa(${destaque}, |Capa de ${destaque.titulo}|)}"></div>
+            <div class="destaque-texto">
+                <p class="destaque-rotulo">A mais bem avaliada da comunidade</p>
+                <h1 id="titulo-destaque" th:text="${destaque.titulo}">Título</h1>
+                <p class="destaque-ficha">
+                    <span th:text="${destaque.tipo.descricao}">Filme</span> de
+                    <span th:text="${destaque.anoLancamento}">2000</span><th:block th:if="${destaque.autorOuDiretor}">,
+                    <span th:text="${destaque.tipo.name() == 'LIVRO'} ? 'escrito por' : 'dirigido por'">dirigido por</span>
+                    <span th:text="${destaque.autorOuDiretor}">Nome</span></th:block>
+                </p>
+                <p class="destaque-nota">
+                    <span class="nota-grande" th:text="${destaque.mediaFormatada}">4,5</span>
+                    <span>
+                        <span class="nota-de">de 5 estrelas</span>
+                        <span class="texto-suave" th:text="|em ${destaque.textoCriticas}|">em 2 críticas</span>
+                    </span>
+                </p>
+                <p class="destaque-sinopse" th:text="${destaque.sinopse}">Sinopse</p>
+                <div class="acoes">
+                    <a th:href="@{/obras/{id}(id=${destaque.id})}" class="botao botao-primario"
+                       th:text="${#authorization.expression('isAuthenticated()')} ? 'Ler as críticas' : 'Entrar para ler as críticas'">Ler as críticas</a>
+                    <a th:href="@{/obras}" class="botao botao-secundario">Ver o catálogo</a>
+                </div>
             </div>
-            <p th:if="${param.saiu}" class="alerta alerta-sucesso" role="status">Você saiu da sua conta.</p>
         </div>
     </section>
 
+    <!-- Sem nenhuma crítica ainda: apresentação simples -->
+    <section th:unless="${destaque}" class="container secao">
+        <h1>Filmes, séries e livros avaliados por quem leu e assistiu</h1>
+        <a th:href="@{/obras}" class="botao botao-primario">Ver o catálogo</a>
+    </section>
+
+    <section th:unless="${#lists.isEmpty(melhores)}" class="container secao" aria-labelledby="titulo-melhores">
+        <div class="secao-topo">
+            <h2 id="titulo-melhores">Mais bem avaliadas</h2>
+            <a th:href="@{/obras}">Ver todas</a>
+        </div>
+        <ul class="faixa-posters">
+            <li th:each="obra : ${melhores}">
+                <a th:replace="~{fragments/layout :: poster(${obra})}"></a>
+            </li>
+        </ul>
+    </section>
+
     <section class="container secao" aria-labelledby="titulo-recentes">
-        <h2 id="titulo-recentes">Adicionadas recentemente</h2>
-        <p class="texto-suave" th:text="|${totalObras} obras no catálogo|">0 obras no catálogo</p>
-
+        <div class="secao-topo">
+            <h2 id="titulo-recentes">Chegaram ao catálogo</h2>
+            <span class="texto-suave" th:text="|${totalObras} obras no total|">8 obras no total</span>
+        </div>
         <p th:if="${#lists.isEmpty(recentes)}">Nenhuma obra cadastrada ainda.</p>
+        <ul class="faixa-posters" th:unless="${#lists.isEmpty(recentes)}">
+            <li th:each="obra : ${recentes}">
+                <a th:replace="~{fragments/layout :: poster(${obra})}"></a>
+            </li>
+        </ul>
+    </section>
 
-        <ul class="grade-cards" th:unless="${#lists.isEmpty(recentes)}">
-            <li th:each="obra : ${recentes}" class="card">
-                <article>
-                    <p class="etiqueta" th:text="${obra.tipo.descricao}">Filme</p>
-                    <h3 th:text="${obra.titulo}">Título</h3>
-                    <p class="texto-suave" th:text="|${obra.genero} · ${obra.anoLancamento}|">Drama · 2000</p>
-                    <p class="media">
-                        <span aria-hidden="true">★</span>
-                        <span th:text="${obra.mediaFormatada}">4,5</span>
-                        <span class="texto-suave" th:text="|(${obra.textoCriticas})|">(3 críticas)</span>
-                    </p>
-                    <a sec:authorize="isAuthenticated()" th:href="@{/obras/{id}(id=${obra.id})}"
-                       th:attr="aria-label=|Ver detalhes de ${obra.titulo}|">Ver detalhes</a>
+    <!-- RN01: críticas só aparecem para usuários logados -->
+    <section sec:authorize="isAuthenticated()" th:unless="${#lists.isEmpty(criticasRecentes)}"
+             class="container secao" aria-labelledby="titulo-criticas-recentes">
+        <h2 id="titulo-criticas-recentes">Críticas recentes</h2>
+        <ul class="criticas-recentes">
+            <li th:each="c : ${criticasRecentes}">
+                <article class="critica-resumo">
+                    <a th:href="@{/obras/{id}(id=${c.obra.id})}" class="critica-resumo-capa" tabindex="-1" aria-hidden="true">
+                        <div th:replace="~{fragments/layout :: capa(${c.obra}, '')}"></div>
+                    </a>
+                    <div>
+                        <h3>
+                            <a th:href="@{/obras/{id}(id=${c.obra.id})}" th:text="${c.obra.titulo}">Título</a>
+                            <span class="texto-suave ano" th:text="${c.obra.anoLancamento}">2000</span>
+                        </h3>
+                        <p class="critica-por">
+                            <span th:text="|Crítica de ${c.autor.nome}|">Crítica de Ana</span>
+                            <span th:replace="~{fragments/layout :: estrelas(${c.nota})}"></span>
+                        </p>
+                        <p class="critica-trecho" th:text="${c.comentario}">Comentário</p>
+                    </div>
                 </article>
             </li>
         </ul>
     </section>
 
-    <section class="container secao" aria-labelledby="titulo-como">
-        <h2 id="titulo-como">Como funciona</h2>
-        <ol class="passos">
-            <li><strong>Explore</strong> o catálogo de filmes, séries e livros, mesmo sem conta.</li>
-            <li><strong>Crie sua conta</strong> para ver os detalhes e as críticas de cada obra.</li>
-            <li><strong>Avalie</strong> com uma nota de 1 a 5 estrelas e um comentário.</li>
-        </ol>
+    <section sec:authorize="isAnonymous()" class="container secao convite" aria-labelledby="titulo-convite">
+        <h2 id="titulo-convite">Crie sua conta e dê a sua nota</h2>
+        <p>
+            O catálogo é aberto a todos. Com uma conta você lê as críticas de cada obra
+            e publica a sua, com uma nota de 1 a 5 estrelas.
+        </p>
+        <a th:href="@{/cadastro}" class="botao botao-primario">Criar conta grátis</a>
     </section>
 </main>
 

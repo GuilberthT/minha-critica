@@ -46,6 +46,12 @@ public class Obra {
     @Column(nullable = false, length = 2000)
     private String sinopse;
 
+    /** Endereço opcional de uma imagem de capa. Sem ele, o site desenha uma capa própria. */
+    @Size(max = 500, message = "O endereço da capa deve ter no máximo 500 caracteres.")
+    @Pattern(regexp = "^(https?://\\S+)?$", message = "Informe um endereço que comece com http:// ou https://.")
+    @Column(length = 500)
+    private String capaUrl;
+
     @Column(nullable = false)
     private LocalDateTime criadoEm = LocalDateTime.now();
 
@@ -82,6 +88,38 @@ public class Obra {
         return total == 1 ? "1 crítica" : total + " críticas";
     }
 
+    /** Quantas críticas deram exatamente esta nota (1 a 5). */
+    public long contagemNota(int nota) {
+        return criticas.stream().filter(c -> c.getNota() == nota).count();
+    }
+
+    /** Largura da barra da nota no gráfico, relativa à nota mais frequente (0 a 100). */
+    public int percentualNota(int nota) {
+        long maior = 0;
+        for (int n = 1; n <= 5; n++) {
+            maior = Math.max(maior, contagemNota(n));
+        }
+        return maior == 0 ? 0 : (int) Math.round(contagemNota(nota) * 100.0 / maior);
+    }
+
+    /**
+     * Matiz (0–360) da capa desenhada pelo site: cada tipo tem uma família de cor
+     * (filme: vinho, série: azul-petróleo, livro: ocre) e cada obra varia um pouco dentro dela.
+     */
+    public int getMatizCapa() {
+        int base = switch (tipo == null ? TipoObra.FILME : tipo) {
+            case FILME -> 345;
+            case SERIE -> 195;
+            case LIVRO -> 28;
+        };
+        int variacao = id == null ? 0 : (int) ((id * 37) % 41) - 20;
+        return Math.floorMod(base + variacao, 360);
+    }
+
+    public boolean isTemCapa() {
+        return capaUrl != null && !capaUrl.isBlank();
+    }
+
     public String getMediaFormatada() {
         return criticas.isEmpty() ? "–" : String.format("%.1f", getMediaNotas()).replace('.', ',');
     }
@@ -100,6 +138,8 @@ public class Obra {
     public void setAutorOuDiretor(String autorOuDiretor) { this.autorOuDiretor = autorOuDiretor; }
     public String getSinopse() { return sinopse; }
     public void setSinopse(String sinopse) { this.sinopse = sinopse; }
+    public String getCapaUrl() { return capaUrl; }
+    public void setCapaUrl(String capaUrl) { this.capaUrl = capaUrl; }
     public LocalDateTime getCriadoEm() { return criadoEm; }
     public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
     public List<Critica> getCriticas() { return criticas; }
