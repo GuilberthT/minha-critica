@@ -503,8 +503,9 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
 .dist-barra > span { display: block; height: 100%; background: var(--ouro); border-radius: inherit; min-width: 0; }
 .dist-qtd { text-align: right; font-variant-numeric: tabular-nums; }
 
-.obra-criticas { padding-block: 2.5rem 1rem; max-width: 860px; margin-left: max(1rem, calc((100% - 1180px) / 2 + 230px + 2.5rem)); }
-@media (max-width: 980px) { .obra-criticas { margin-inline: auto; max-width: none; } }
+.obra-criticas { padding-block: 2.5rem 1rem; padding-left: calc(230px + 2.5rem); }
+.obra-criticas > * { max-width: 860px; }
+@media (max-width: 980px) { .obra-criticas { padding-left: 0; } }
 .obra-criticas > h2 { border-bottom: 1px solid var(--linha); padding-bottom: .5rem; }
 
 .lista-criticas { list-style: none; padding: 0; margin: 0; }
